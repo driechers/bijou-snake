@@ -16,7 +16,11 @@ def getch():
 UDP_IP = "127.0.0.1"
 UDP_PORT = 5005
 
-uid = "driechers"
+if len(sys.argv) != 2:
+	print 'arg1 = username'
+	sys.exit(1)
+
+uid = sys.argv[1]
 action = "join"
 
 print "sending join as " + uid

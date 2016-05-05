@@ -54,9 +54,6 @@ class Game(object):
 				player = d[0]
 				action = d[1]
 
-			print action
-			print player
-			print 'aaaaaaaaa'
 			# perform the action
 			hor = 0
 			vert = 0
