@@ -24,7 +24,7 @@ class Game(object):
 
 		self.sock = socket.socket(socket.AF_INET, # Internet
 			socket.SOCK_DGRAM) # UDP
-		self.sock.settimeout(.2)
+		self.sock.settimeout(.1)
 		self.sock.bind((UDP_IP, UDP_PORT))
 
 		pygame.mouse.set_visible(False)
@@ -57,15 +57,14 @@ class Game(object):
 			# perform the action
 			hor = 0
 			vert = 0
-			if action == 'left': hor = -25
-			if action == 'right': hor = 25
-			if action == 'up': vert = -25
-			if action == 'down': vert = 25
+			if action == 'left': hor = -2
+			if action == 'right': hor = 2
+			if action == 'up': vert = -2
+			if action == 'down': vert = 2
 			if action == 'join': self.map.addPlayer(player)
 
 			try:
-				self.map.players[player].x += hor
-				self.map.players[player].y += vert
+				self.map.players[player].setVelocity(hor, vert)
 			except Exception:
 				pass
 

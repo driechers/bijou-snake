@@ -14,7 +14,11 @@ class Map(object):
 		surface = pygame.Surface((1024, 768))
 
 		for key in self.players:
-			pygame.draw.rect(surface, (255,255,255),
-				(self.players[key].x, self.players[key].y, 25,25))
+			# make position updates to collition rectangles from velocity
+			self.players[key].update()
+
+			# draw all the rectangles
+			#surface.blit(self.players[key].drawSurface(), (0,0))
+			self.players[key].drawToSurface(surface)
 
 		return surface
