@@ -3,14 +3,11 @@
 import pygame
 import math
 import sys
-
 import socket
 
 from Map import Map
 from pygame.locals import *
-
-BLACK = (0,0,0)
-WHITE = (255, 255, 255)
+from threading import Thread, Lock
 
 class Game(object):
 	def __init__(self):
@@ -18,6 +15,7 @@ class Game(object):
 		self.screen = pygame.display.set_mode((1024, 768))
 		self.clock = pygame.time.Clock()
 		self.map = Map()
+		self.quit = False
 
 		UDP_IP = "127.0.0.1"
 		UDP_PORT = 5005
@@ -28,15 +26,21 @@ class Game(object):
 		self.sock.bind((UDP_IP, UDP_PORT))
 
 		pygame.mouse.set_visible(False)
+
+		self.mutex = Lock()
+		t = Thread(target = Game.netThread, args = (self,))
+		t.start()
+
 		self.run()
 
-	def run(self):
-		while 1:
-			# look for exit
-			self.clock.tick(30)
-			for event in pygame.event.get():
-				if not hasattr(event, 'key'): continue
-				if event.key == K_ESCAPE: sys.exit(0)
+	def netThread(self):
+		while True:
+			# Check for quit
+			self.mutex.acquire()
+			if self.quit:
+				self.mutex.release()
+				break
+			self.mutex.release()
 
 			# handle single packet
 			data = ''
@@ -62,6 +66,8 @@ class Game(object):
 			if action == 'up': vert = -5
 			if action == 'down': vert = 5
 
+			self.mutex.acquire()
+
 			if action == 'join':
 				self.map.addPlayer(player)
 			else:
@@ -70,8 +76,26 @@ class Game(object):
 				except Exception:
 					pass
 
+			self.mutex.release()
+
+	def run(self):
+		while 1:
+			# look for exit
+			self.clock.tick(30)
+			for event in pygame.event.get():
+				if not hasattr(event, 'key'): continue
+				if event.key == K_ESCAPE:
+					self.mutex.acquire()
+					self.quit = True
+					self.mutex.release()
+
+					sys.exit(0)
+
 			# draw the screen
+			self.mutex.acquire()
 			self.screen.blit(self.map.drawSurface(), (0,0))
+			self.mutex.release()
+			
 			pygame.display.flip()
  
 if __name__ == "__main__":
