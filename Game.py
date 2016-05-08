@@ -57,16 +57,18 @@ class Game(object):
 			# perform the action
 			hor = 0
 			vert = 0
-			if action == 'left': hor = -2
-			if action == 'right': hor = 2
-			if action == 'up': vert = -2
-			if action == 'down': vert = 2
-			if action == 'join': self.map.addPlayer(player)
+			if action == 'left': hor = -5
+			if action == 'right': hor = 5
+			if action == 'up': vert = -5
+			if action == 'down': vert = 5
 
-			try:
-				self.map.players[player].setVelocity(hor, vert)
-			except Exception:
-				pass
+			if action == 'join':
+				self.map.addPlayer(player)
+			else:
+				try:
+					self.map.players[player].setVelocity(hor, vert)
+				except Exception:
+					pass
 
 			# draw the screen
 			self.screen.blit(self.map.drawSurface(), (0,0))

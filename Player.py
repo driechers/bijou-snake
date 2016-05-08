@@ -7,7 +7,7 @@ class collisionRect(object):
 		self.w = w
 		self.h = h
 
-		self.dx = 0
+		self.dx = 5
 		self.dy = 0
 
 	def update(self):
@@ -25,16 +25,45 @@ class Player(object):
 		self.length = 1
 		self.x = 25
 		self.y = 25
+		self.newDx = 0
+		self.newDy = 0
 
-		self.rects = [ collisionRect(25,25,25,25) ]
+		self.rects = [ collisionRect(100,25,25,25), collisionRect(75,25,25,25) , collisionRect(50,25,25,25) , collisionRect(25,25,25,25) ]
+
+		self.tick = 0
 
 	def update(self):
+		# every so often shift velocities to next block
+		head = self.rects[0]
+
+		# 25 to be replaced with width, height
+		if ((head.x % 25) == 0 and head.dx) or ((head.y % 25) == 0 and head.dy):
+			# update body velocity
+			for i, rect in reversed(list(enumerate(self.rects))):
+				if i != 0:
+					self.rects[i].dx = self.rects[i-1].dx
+					self.rects[i].dy = self.rects[i-1].dy
+
+			# update head velocity once in valid spot
+			if self.newDx or self.newDy:
+				self.rects[0].dx = self.newDx
+				self.rects[0].dy = self.newDy
+
+				self.newDx = 0
+				self.newDy = 0
+				
+
+		# update position of each rect
 		for i,rect in enumerate(self.rects):
 			self.rects[i].update()
 
 	def setVelocity(self, dx, dy):
-		self.rects[0].dx = dx
-		self.rects[0].dy = dy
+		head = self.rects[0]
+
+		# do not allow reverse
+		if (dx and head.dx != -dx) or (dy and head.dy != -dy):
+			self.newDx = dx
+			self.newDy = dy
 
 	def drawToSurface(self, surface):
 		for rect in self.rects:
