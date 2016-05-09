@@ -25,7 +25,7 @@ class Player(object):
 
 		self.bounds = bounds
 
-		self.rects = [ CollisionRect(100,25,25,25), CollisionRect(75,25,25,25) , CollisionRect(50,25,25,25) , CollisionRect(25,25,25,25) ]
+		self.rects = [ CollisionRect(25,25,25,25) ]
 
 		self.tick = 0
 
@@ -61,6 +61,21 @@ class Player(object):
 		y = y - (y % 25)
 
 		self.rects = [ CollisionRect(x,y,25,25) ]
+
+	def eat(self):
+		tail = self.rects[len(self.rects) - 1]
+
+		if tail.dx > 0:
+			self.rects.append(CollisionRect(tail.x-25, tail.y, 25, 25))
+		elif tail.dx < 0:
+			self.rects.append(CollisionRect(tail.x+25, tail.y, 25, 25))
+		elif tail.dy > 0:
+			self.rects.append(CollisionRect(tail.x, tail.y-25, 25, 25))
+		elif tail.dy < 0:
+			self.rects.append(CollisionRect(tail.x, tail.y+25, 25, 25))
+
+		self.rects[len(self.rects) - 1].dx = tail.dx
+		self.rects[len(self.rects) - 1].dy = tail.dy
 
 	def update(self):
 		# kill if out of bounds

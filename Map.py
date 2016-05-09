@@ -32,6 +32,7 @@ class Map(object):
 			for i, seed in enumerate(self.seeds):
 				if seed.colliderect(self.players[key].rects[0]):
 					self.seeds[i].move()
+					self.players[key].eat()
 
 			# make position updates to collition rectangles from velocity
 			self.players[key].update()
