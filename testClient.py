@@ -13,14 +13,15 @@ def getch():
             termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
         return ch
 
-UDP_IP = "127.0.0.1"
-UDP_PORT = 5005
-
-if len(sys.argv) != 2:
-	print 'arg1 = username'
+if len(sys.argv) != 3:
+	print 'arg1 = server'
+	print 'arg2 = username'
 	sys.exit(1)
 
-uid = sys.argv[1]
+UDP_IP = sys.argv[1]
+UDP_PORT = 5005
+
+uid = sys.argv[2]
 action = "join"
 
 print "sending join as " + uid
