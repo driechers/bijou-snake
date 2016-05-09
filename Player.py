@@ -1,6 +1,8 @@
 import pygame
 
-class collisionRect(object):
+from random import *
+
+class CollisionRect(pygame.Rect):
 	def __init__(self, x, y, w, h):
 		self.x = x
 		self.y = y
@@ -14,25 +16,61 @@ class collisionRect(object):
 		self.x += self.dx
 		self.y += self.dy
 
-	def getRect(self):
-		return pygame.Rect(x, y, w, h)
-
 class Player(object):
-	def __init__(self, name):
+	def __init__(self, name, bounds):
 		self.name = name
 
-		#going away soon
-		self.length = 1
-		self.x = 25
-		self.y = 25
 		self.newDx = 0
 		self.newDy = 0
 
-		self.rects = [ collisionRect(100,25,25,25), collisionRect(75,25,25,25) , collisionRect(50,25,25,25) , collisionRect(25,25,25,25) ]
+		self.bounds = bounds
+
+		self.rects = [ CollisionRect(100,25,25,25), CollisionRect(75,25,25,25) , CollisionRect(50,25,25,25) , CollisionRect(25,25,25,25) ]
 
 		self.tick = 0
 
+	def inBounds(self):
+		for rect in self.rects:
+			if not self.bounds.contains(rect):
+				return False
+
+		return True
+
+	def collidesWithSelf(self):
+		head = self.rects[0]
+
+		for i, rect in enumerate(self.rects):
+			if i > 1 and head.colliderect(rect):
+				return True
+
+		return False
+
+	def collidesWith(self, other):
+		for otherRect in other:
+			for rect in self.rects:
+				if otherRect.colliderect(rect):
+					return True
+
+		return False
+			
+
+	def kill(self):
+		x = randint(0, self.bounds.w - 25);
+		x = x - (x % 25)
+		y = randint(0, self.bounds.h - 25);
+		y = y - (y % 25)
+
+		self.rects = [ CollisionRect(x,y,25,25) ]
+
 	def update(self):
+		# kill if out of bounds
+		if not self.inBounds():
+			self.kill()
+
+		# kill if colliding with self
+		if self.collidesWithSelf():
+			self.kill()
+
 		# every so often shift velocities to next block
 		head = self.rects[0]
 

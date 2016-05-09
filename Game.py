@@ -9,12 +9,16 @@ from Map import Map
 from pygame.locals import *
 from threading import Thread, Lock
 
+bounds = (1024, 768)
+
 class Game(object):
 	def __init__(self):
 		#self.screen = pygame.display.set_mode((1024, 768), pygame.FULLSCREEN)
-		self.screen = pygame.display.set_mode((1024, 768))
+		self.screen = pygame.display.set_mode(bounds)
 		self.clock = pygame.time.Clock()
-		self.map = Map()
+
+		mapRect = pygame.Rect(0, 0, bounds[0], bounds[1])
+		self.map = Map(mapRect)
 		self.quit = False
 
 		UDP_IP = "127.0.0.1"
