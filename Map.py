@@ -45,3 +45,11 @@ class Map(object):
 				seed.drawToSurface(surface)
 
 		return surface
+
+	def destroy(self):
+		for key in self.players:
+			player = self.players[key]
+
+			print player.name
+			print "maxLen: " + str(player.maxLen)
+			print "deaths: " + str(player.deaths)

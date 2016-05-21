@@ -21,7 +21,7 @@ class Game(object):
 		self.map = Map(mapRect)
 		self.quit = False
 
-		UDP_IP = "127.0.0.1"
+		UDP_IP = "0.0.0.0"
 		UDP_PORT = 5005
 
 		self.sock = socket.socket(socket.AF_INET, # Internet
@@ -42,6 +42,7 @@ class Game(object):
 			# Check for quit
 			self.mutex.acquire()
 			if self.quit:
+				self.map.destroy()
 				self.mutex.release()
 				break
 			self.mutex.release()
