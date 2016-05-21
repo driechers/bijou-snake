@@ -20,7 +20,7 @@ class JoinPage(object):
 		self.startTime = time.time()
 
 	def updateCountDown(self):
-		self.numSec = int(self.totalSec - (time.time() - self.startTime))
+		self.numSec = int(round(self.totalSec - (time.time() - self.startTime)))
 
 		if self.numSec <= 0:
 			self.ready = True
