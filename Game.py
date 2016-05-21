@@ -6,16 +6,25 @@ import sys
 import socket
 
 from Map import Map
+from JoinPage import JoinPage
+
 from pygame.locals import *
 from threading import Thread, Lock
 
 bounds = (1024, 768)
 
+JOIN = 0
+PLAY = 1
+SCORE = 2
+
 class Game(object):
 	def __init__(self):
+		pygame.init()
+
 		#self.screen = pygame.display.set_mode((1024, 768), pygame.FULLSCREEN)
 		self.screen = pygame.display.set_mode(bounds)
 		self.clock = pygame.time.Clock()
+		self.state = JOIN
 
 		mapRect = pygame.Rect(0, 0, bounds[0], bounds[1])
 		self.map = Map(mapRect)
@@ -31,11 +40,29 @@ class Game(object):
 
 		pygame.mouse.set_visible(False)
 
+		self.joinPage = JoinPage(bounds)
+
 		self.mutex = Lock()
 		t = Thread(target = Game.netThread, args = (self,))
 		t.start()
 
-		self.run()
+		self.countDown()
+
+	def countDown(self):
+		self.joinPage.startCountDown(10)
+
+		while True:
+			self.mutex.acquire()
+			if self.joinPage.ready:
+				self.mutex.release()
+				break
+
+			self.screen.blit(self.joinPage.drawSurface(), (0,0))
+			self.mutex.release()
+
+			pygame.display.flip()
+
+		self.play()
 
 	def netThread(self):
 		while True:
@@ -66,16 +93,19 @@ class Game(object):
 			# perform the action
 			hor = 0
 			vert = 0
-			if action == 'left': hor = -5
-			if action == 'right': hor = 5
-			if action == 'up': vert = -5
-			if action == 'down': vert = 5
+			if self.state == PLAY:
+				if action == 'left': hor = -5
+				if action == 'right': hor = 5
+				if action == 'up': vert = -5
+				if action == 'down': vert = 5
 
 			self.mutex.acquire()
 
 			if action == 'join':
-				self.map.addPlayer(player)
-			else:
+				if self.state == JOIN:
+					self.map.addPlayer(player)
+					self.joinPage.addPlayer(player)
+			elif self.state == PLAY:
 				try:
 					self.map.players[player].setVelocity(hor, vert)
 				except Exception:
@@ -83,7 +113,9 @@ class Game(object):
 
 			self.mutex.release()
 
-	def run(self):
+	def play(self):
+		self.state = PLAY
+
 		while 1:
 			# look for exit
 			self.clock.tick(30)
